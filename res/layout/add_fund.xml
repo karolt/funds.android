@@ -2,5 +2,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" android:orientation="vertical">
-	<Button android:id="@+id/button_add_fund" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="@string/button_add_fund" android:layout_gravity="center" android:layout_marginTop="15sp"></Button>
+    <TextView android:text="tu bedziemy dodawac jednostki" android:id="@+id/textView1" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
 </LinearLayout>
