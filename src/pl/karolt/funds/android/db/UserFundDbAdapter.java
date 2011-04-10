@@ -1,6 +1,7 @@
 package pl.karolt.funds.android.db;
 
 
+import pl.karolt.funds.android.funds.UserFund;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,11 +16,11 @@ public class UserFundDbAdapter {
 	private static final String DB_TABLE_NAME	= "user_fund";
 	private static final String DB_TABLE_CREATE	= "create table user_fund " +
 								"(_id integer primary key autoincrement, "
-        						+ "fund_id integer not_null, "
-								+ "money_paid double not null, "
-								+ "current_value double not null"
-								+ "simple_return double"
-								+ "real_return double"
+        						+ "fundId integer not_null, "
+								+ "moneyPaid double not null, "
+								+ "units double not null, "
+								+ "currentValue double not null"
+								+ "simpleReturn double"
 								+ ");";
 	
 	
@@ -47,22 +48,26 @@ public class UserFundDbAdapter {
     }
     
     /**
-     * wstawia nowy fundusz do bazy wszystkich dostepnych funduszy
-     * @param name
-     * @param value obecna wartosc
-     * @return long identyfikator w bazie
+     * wstawia nowy rekord z funduszem usera
+     * 
+     * @param UserFund userFund
+     * @return long
      */
-    public long newFund(String name, Double value) {
+    public long newUserFund(UserFund userFund) {
         ContentValues initialValues = new ContentValues();
-        initialValues.put("name", name);
-        initialValues.put("value", value);
-        Log.v(TAG, "adding new Fund " + name);
+        initialValues.put("fundId", userFund.getFundId());
+        initialValues.put("moneyPaid", userFund.getMoneyPaid());
+        initialValues.put("currentValue", userFund.getCurrentValue());
+        initialValues.put("units", userFund.getUnits());
+        initialValues.put("simpleReturn", userFund.getSimpleReturn());
+        
+        Log.v(TAG, "adding new User Fund " + userFund);
         return mDb.insert(DB_TABLE_NAME, null, initialValues);
     }
     
-    public Cursor getAllAvailable()
+    public Cursor getAll()
     {
-    	return mDb.query(DB_TABLE_NAME, new String[] {"_id","name", "value"}, null, null, null, null, null);
+    	return mDb.query(DB_TABLE_NAME, new String[] {"_id","fundId", "moneyPaid", "currentValue", "units", "simpleReturn"}, null, null, null, null, null);
     }
 	
 	

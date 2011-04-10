@@ -76,9 +76,9 @@ public class FundOperation {
 	{
 		String str = "fundId="+fundId+", value="+value+", units="+units+", performedAt="+performedAt; 
 		if (id != 0) {
-			str += "id="+id+", "; 
+			str = "id="+id+", " + str; 
 		} else {
-			str += "no id(not saved)";
+			str = "no id(not saved)" + str;
 		}
 			
 		return "Operation ("+type+":"+getTypeAsString()+"): "+str;

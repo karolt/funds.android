@@ -31,7 +31,7 @@ public class FundsMain extends Activity {
 	
 	
 	private FundDbAdapter mAllFundsDb;
-	private FundOperationHistoryDbAdapter mUserFundHistoryDb;
+	private FundOperationHistoryDbAdapter mFundOperationHistoryDb;
 	
     /** Called when the activity is first created. */
     @Override
@@ -51,8 +51,8 @@ public class FundsMain extends Activity {
         mAllFundsDb = new FundDbAdapter(this);
         mAllFundsDb.open();
         
-        mUserFundHistoryDb = new FundOperationHistoryDbAdapter(this);
-        mUserFundHistoryDb.open();
+        mFundOperationHistoryDb = new FundOperationHistoryDbAdapter(this);
+        mFundOperationHistoryDb.open();
         
         //DbHelper helper = DbHelper.getInstance(this);
         //helper.onUpgrade(helper.getWritableDatabase(),2,3);
@@ -92,7 +92,9 @@ public class FundsMain extends Activity {
 	@Override
     protected void onResume() {
         super.onResume();
+        _writeAllFundsToLog();
         _populateFields();
+        _writeAllPurchasesToLog();
         
     }
 	
@@ -115,23 +117,19 @@ public class FundsMain extends Activity {
 	 */
 	public void _writeAllFundsToLog()
 	{
+		Log.d(TAG, "ALL FUNDS:");
+		
 		Cursor allFunds = mAllFundsDb.getAllAvailableCursor();
         startManagingCursor(allFunds);
         
 		allFunds.moveToFirst();
-        String name;
-        Double value;
         Fund fund;
         
         try 
         {
         	while (!allFunds.isAfterLast())
             {
-            	fund = new Fund(	allFunds.getLong(allFunds.getColumnIndex("_id")),
-    		        				allFunds.getString(allFunds.getColumnIndex("name")),
-    		        				allFunds.getDouble(allFunds.getColumnIndex("value")),
-    		        				allFunds.getInt(allFunds.getColumnIndex("type"))
-    		        				);
+            	fund = new Fund(allFunds);
             	Log.d(TAG, "found " + fund);
             	allFunds.moveToNext();
             }
@@ -147,7 +145,8 @@ public class FundsMain extends Activity {
 	 */
 	public void _writeAllPurchasesToLog()
 	{
-		Cursor allPurchases = mUserFundHistoryDb.getAllAvailable();
+		Log.d(TAG, "ALL OPERATIONS:");
+		Cursor allPurchases = mFundOperationHistoryDb.getAllAvailable();
         startManagingCursor(allPurchases);
         
         allPurchases.moveToFirst();

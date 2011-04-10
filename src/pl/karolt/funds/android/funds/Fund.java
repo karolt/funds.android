@@ -1,5 +1,6 @@
 package pl.karolt.funds.android.funds;
 
+import android.database.Cursor;
 import pl.karolt.funds.android.funds.exceptions.UnknownFundTypeException;
 
 public class Fund {
@@ -84,14 +85,23 @@ public class Fund {
 		}
 		this.type = type;
 	}
+	
+	public Fund (Cursor cursor)
+	{
+		id		= cursor.getLong(cursor.getColumnIndex("_id"));
+		name	= cursor.getString(cursor.getColumnIndex("name"));
+		type	= cursor.getInt(cursor.getColumnIndex("type"));
+		currentValue	= cursor.getDouble(cursor.getColumnIndex("currentValue"));
+		
+	}
 
 	public String toString()
 	{
 		String str = "name="+name+", currentValue="+currentValue+", type="+getTypeAsString()+"("+type+")"; 
 		if (id != 0) {
-			str += "id="+id+", "; 
+			str = "id="+id+", " + str; 
 		} else {
-			str += "no id(not saved)";
+			str = "no id(not saved) + str";
 		}
 			
 		return "Fund: "+str;

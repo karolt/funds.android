@@ -56,17 +56,22 @@ public class FundDbAdapter {
         return mDb.insert(DB_TABLE_NAME, null, initialValues);
     }
     
-    /*
-    public Fund getById()
+
+    public Fund getById(long id)
     {
-    	return mDb.query(DB_TABLE_NAME, new String[] {"_id","name", "value"}, null, null, null, null, null);
-    	return new Fund();
+    	Cursor c = mDb.query(DB_TABLE_NAME, new String[] {"_id","name", "currentValue", "type"}, "_id = " + id, null, null, null, null);
+
+    	if (c != null) {
+            c.moveToFirst();
+        }
+    	
+    	return new Fund(c);
     }
-    */
+    
     
     public Cursor getAllAvailableCursor()
     {
-    	return mDb.query(DB_TABLE_NAME, new String[] {"_id","name", "currentValue"}, null, null, null, null, null);
+    	return mDb.query(DB_TABLE_NAME, new String[] {"_id","name", "currentValue", "type"}, null, null, null, null, null);
     }
     
 }

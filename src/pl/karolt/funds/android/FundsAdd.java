@@ -1,7 +1,9 @@
 package pl.karolt.funds.android;
 
 import pl.karolt.funds.android.db.FundDbAdapter;
+import pl.karolt.funds.android.db.FundOperationHistoryDbAdapter;
 import pl.karolt.funds.android.funds.Fund;
+import pl.karolt.funds.android.funds.FundOperation;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
@@ -18,10 +21,13 @@ public class FundsAdd extends Activity {
 	private static final String TAG = "FundsAdd";
 	
 	private FundDbAdapter mAllFundsDb;
+	private FundOperationHistoryDbAdapter mFundOperationHistoryDb;
+	
 	private Spinner mAllFundsSpinner;
 	
 	private String mSelectedFundName;
-	private Double mGivenFundOperationValue;  
+	private long mSelectedFundId;
+	//private Double mGivenFundOperationValue;  
 	
 	/** Called when the activity is first created. */
     @Override
@@ -32,6 +38,9 @@ public class FundsAdd extends Activity {
         mAllFundsDb = new FundDbAdapter(this);
         mAllFundsDb.open();
         
+        mFundOperationHistoryDb = new FundOperationHistoryDbAdapter(this);
+        mFundOperationHistoryDb.open();
+        
         
         Button addButton = (Button)findViewById(R.id.add_button_add);
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -40,11 +49,16 @@ public class FundsAdd extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				EditText valueEditText = (EditText)findViewById(R.id.add_edittxt_value);
-				Log.v(TAG, "Adding Operation for name: " + mSelectedFundName + " value: " + valueEditText.getText().toString());
+				
+				DatePicker datePicker = (DatePicker)findViewById(R.id.add_datepicker);
+		        String date = datePicker.getDayOfMonth()+"-"+datePicker.getMonth()+"-"+datePicker.getYear();
+		        String valueStr = valueEditText.getText().toString();
+				_saveData(mSelectedFundId, valueStr, date);
+		        
+		        Log.v(TAG, "Adding Operation for name: " + mSelectedFundName + " value: " + valueEditText.getText().toString()+ " date:"+ date);
 				
 			}
 		});
-        
         
         
         Spinner mAllFundsSpinner = (Spinner)findViewById(R.id.add_spinner_available_funds);
@@ -53,9 +67,13 @@ public class FundsAdd extends Activity {
 			@Override
 			public void onItemSelected(AdapterView<?> parent,
 					android.view.View v, int position, long row) {
-				String fundName = parent.getItemAtPosition(position).toString();
-				Log.v(TAG, "Fund Selected at postion "+position+" " + fundName);
+				
+				Cursor c = (Cursor)parent.getItemAtPosition(position);
+				String fundName = c.getString(c.getColumnIndex("name"));
+				long fundId = c.getLong(c.getColumnIndex("_id"));
+				Log.v(TAG, "Fund Selected at postion "+position+" " + "id:"+fundId+" name:"+fundName);
 				mSelectedFundName = fundName;
+				mSelectedFundId = fundId;
 			}
 
 			@Override
@@ -101,6 +119,25 @@ public class FundsAdd extends Activity {
                                                  
         allFundsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mAllFundsSpinner.setAdapter(allFundsAdapter);
+	}
+	
+	/**
+	 * na podstawie danych z formularza dodaje operacje do historii + modyfikuje dane o funduszach usera
+	 * 
+	 * @param mSelectedFundId
+	 * @param valueStr
+	 * @param date
+	 * @return
+	 */
+	private boolean _saveData(long mSelectedFundId, String valueStr, String date)
+	{
+		Fund fund = mAllFundsDb.getById(mSelectedFundId);
+		double value = Double.parseDouble(valueStr);
+		
+		double units = value / fund.getCurrentValue();
+		FundOperation operation = new FundOperation(fund, value, units, FundOperation.TYPE_BUY, date);
+		mFundOperationHistoryDb.newOperation(operation);
+		return true;
 	}
 	
 	/*
