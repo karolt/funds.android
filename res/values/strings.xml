@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Portfel Funduszy Inwesycyjnych</string>
-    <string name="logtag">funds</string>
-    <string name="no_funds">Dodaj Jednostki Funduszy, które posiadasz</string>
-    <string name="button_add_fund">Dodaj Jednostki do Portfela</string>
+    
+    <string name="main_no_funds">Brak Funduszy w Portfelu</string>
+    <string name="main_button_add_fund">Dodaj Fundusz</string>
+    
+     <string name="add_value">Wartośc zakupu</string>
+     <string name="add_button">Dodaj Fundusz</string>
+    
     <string name="menu_add_fund">Dodaj Jednostki</string>
 </resources>

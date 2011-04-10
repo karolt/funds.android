@@ -2,5 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" android:orientation="vertical">
-    <TextView android:text="tu bedziemy dodawac jednostki" android:id="@+id/textView1" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+    <Spinner android:id="@+id/add_spinner_available_funds" android:layout_height="wrap_content" android:layout_width="match_parent" ></Spinner>
+    <DatePicker android:id="@+id/add_datepicker" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="center_horizontal"></DatePicker>
+    <EditText android:id="@+id/add_edittxt_value" android:text="@string/add_value" android:layout_width="match_parent" android:layout_height="wrap_content"></EditText>
+    <Button android:id="@+id/add_button_add" android:layout_width="wrap_content" android:layout_gravity="center_horizontal" android:layout_height="wrap_content" android:text="@string/add_button"></Button>
 </LinearLayout>

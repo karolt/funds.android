@@ -20,7 +20,7 @@ public class DbHelper extends SQLiteOpenHelper {
 	private static DbHelper instance;
 	
 	private static final String	DB_NAME		= "funds";
-	private static final int	DB_VERSION	= 2;
+	private static final int	DB_VERSION	= 3;
 	
 	/**
 	 * hashmap tableName -> create query
@@ -93,8 +93,26 @@ public class DbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		//TODO: implement me
-		Log.v(TAG, "onUpgrade DOING NOTHING, wanted to Upgrade from version:" + oldVersion + " to version:" + newVersion);
+		Log.w(TAG, "onUpgrade DOING NOTHING, wanted to Upgrade from version:" + oldVersion + " to version:" + newVersion);
+		
+		drop(db);
 
+		onCreate(db);
+	}
+	
+	public void drop(SQLiteDatabase db)
+	{
+		Iterator<String> tableNames = tableCreateQueries.keySet().iterator();
+		String tableName, query;
+		
+		while (tableNames.hasNext())
+		{
+			tableName	= tableNames.next();
+			
+			Log.d(TAG, "dropping table " + tableName);
+			query = "DROP TABLE " + tableName;
+			db.execSQL(query);
+		}
 	}
 
 }
