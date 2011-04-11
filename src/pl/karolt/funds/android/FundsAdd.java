@@ -6,7 +6,11 @@ import pl.karolt.funds.android.db.UserFundDbAdapter;
 import pl.karolt.funds.android.funds.Fund;
 import pl.karolt.funds.android.funds.FundOperation;
 import pl.karolt.funds.android.funds.UserFund;
+import pl.karolt.funds.android.funds.exceptions.NotImplementedException;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -82,9 +86,14 @@ public class FundsAdd extends Activity {
 				DatePicker datePicker = (DatePicker)findViewById(R.id.add_datepicker);
 		        String date = datePicker.getDayOfMonth()+"-"+datePicker.getMonth()+"-"+datePicker.getYear();
 		        String valueStr = valueEditText.getText().toString();
-				_saveData(mSelectedFundId, valueStr, date);
+				if (_saveData(mSelectedFundId, valueStr, date)) {
+					setResult(RESULT_OK);
+	                finish();
+				} else {
+					_showErrorDialog();
+				}
 		        
-		        Log.v(TAG, "Adding Operation for name: " + mSelectedFundName + " value: " + valueEditText.getText().toString()+ " date:"+ date);
+		        
 				
 			}
 		});
@@ -124,13 +133,7 @@ public class FundsAdd extends Activity {
         
     }
     
-    @Override
-    protected void onDestroy() {
-    	super.onDestroy();
-    	mAllFundsDb.close();
-    	mUserFundDb.close();
-    	mFundOperationHistoryDb.close();
-    }
+    
     
     
     private void _populateFields()
@@ -175,11 +178,52 @@ public class FundsAdd extends Activity {
 		FundOperation operation = new FundOperation(fund, value, units, FundOperation.TYPE_BUY, date);
 		mFundOperationHistoryDb.newOperation(operation);
 		
-		UserFund userFund = new UserFund(fund, value, units, value, 0.0);
-		mUserFundDb.newUserFund(userFund);
+		UserFund fundAllreadyInUserFunds = mUserFundDb.getByFund(fund);
+		if (fundAllreadyInUserFunds == null) 
+		{
+			UserFund userFund = new UserFund(fund, value, units, value, 0.0);
+			mUserFundDb.newUserFund(userFund);
+			
+			return true;
+		} else {
+			try {
+				fundAllreadyInUserFunds.performOperation(operation);
+				Log.d(TAG, "Updating userFund " +fundAllreadyInUserFunds);
+				int changed = mUserFundDb.update(fundAllreadyInUserFunds);
+				if (changed <= 0) {
+					Log.w(TAG, "zero rows affected while updating userFund");
+				}
+				
+				return true;
+			} catch (NotImplementedException e) {
+				Log.e(TAG, e.getMessage());
+				return false;
+			}
+			
+		}
 		
-		
-		return true;
+	}
+	
+	private void _showErrorDialog()
+	{
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Wyst¹pi³ nieoczekiwany b³¹d. Wys³ac zg³oszenie do twórców programu ?")
+		       .setCancelable(false)
+		       .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   //TODO: wysylanei zgloszenia
+		        	   Log.w(TAG, "Sending failure report not yet implemented");
+		        	   setResult(RESULT_CANCELED);
+		               finish();
+		           }
+		       })
+		       .setNegativeButton("Nie", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   setResult(RESULT_CANCELED);
+		               finish();
+		           }
+		       });
+		AlertDialog alert = builder.create();
 	}
 	
 	/*

@@ -21,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class FundsMain extends Activity {
 	
@@ -40,17 +41,7 @@ public class FundsMain extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        Button addButton = (Button) findViewById(R.id.main_button_add_fund);
         
-        addButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				_startAddFundActivity();
-				
-			}
-		});
-       
         mAllFundsDb = new FundDbAdapter(this);
         mAllFundsDb.open();
         
@@ -59,6 +50,23 @@ public class FundsMain extends Activity {
         
         mUserFundDb = new UserFundDbAdapter(this);
         mUserFundDb.open();
+        
+        Cursor userFundsCusor = mUserFundDb.getAll();
+        if (userFundsCusor.getCount() == 0) {
+        	setContentView(R.layout.main_no_funds);
+            Button addButton = (Button) findViewById(R.id.main_button_add_fund);
+            
+            addButton.setOnClickListener(new View.OnClickListener() {
+    			@Override
+    			public void onClick(View v) {
+    				_startAddFundActivity();
+    				
+    			}
+    		});
+           
+        } else {
+        	setContentView(R.layout.main);
+        }
         
         //DbHelper helper = DbHelper.getInstance(this);
         //helper.onUpgrade(helper.getWritableDatabase(),2,2);
@@ -106,6 +114,14 @@ public class FundsMain extends Activity {
         
     }
 	
+	@Override
+    protected void onDestroy() {
+    	super.onDestroy();
+    	mAllFundsDb.close();
+    	mUserFundDb.close();
+    	mFundOperationHistoryDb.close();
+    }
+	
 	private void _populateFields()
 	{
         
@@ -117,6 +133,19 @@ public class FundsMain extends Activity {
 		Intent intent = new Intent(this, FundsAdd.class);
 		startActivityForResult(intent, ACTIVITY_ADD);
 	}
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == ACTIVITY_ADD) {
+        	if (resultCode == RESULT_OK) {
+        		Toast.makeText(this, "Zakup jednostek zosta³ zapisany", Toast.LENGTH_LONG).show();
+        	} else {
+        		Toast.makeText(this, "Niestety nie udalo sie zapisac danych", Toast.LENGTH_LONG).show();
+        	}
+        }
+              
+    }
 	
 	/**
 	 * wypisuje do logCata informacje o wszystkich dostepnych funduszach

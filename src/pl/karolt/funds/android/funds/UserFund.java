@@ -1,5 +1,6 @@
 package pl.karolt.funds.android.funds;
 
+import pl.karolt.funds.android.funds.exceptions.NotImplementedException;
 import android.database.Cursor;
 
 public class UserFund {
@@ -12,7 +13,7 @@ public class UserFund {
 	
 	/**
 	 * fundusz, ktory zakupil user
-	 * dopierany na podstawie fundId
+	 * dobierany na podstawie fundId
 	 */
 	private Fund fund;
 	
@@ -88,7 +89,24 @@ public class UserFund {
 		return "UserFund : "+str;
 	}
 
-
+	/**
+	 * przeprowadza zadana operacje na fudnuszu usera
+	 * 
+	 * @param FundOperation operation
+	 * @throws NotImplementedException obecnie uzywany dla niezaimplementowanej operacji odkupienia jednostek 
+	 */
+	public void performOperation(FundOperation operation) throws NotImplementedException
+	{
+		if (operation.getType() == FundOperation.TYPE_BUY)
+		{
+			moneyPaid	+= operation.getValue();
+			units		+= operation.getUnits();
+			currentValue+= operation.getValue();
+			simpleReturn = currentValue/moneyPaid - 1;
+		} else {
+			throw new NotImplementedException("only Buy Operation can be performed");
+		}
+	}
 
 
 	public long getId() {

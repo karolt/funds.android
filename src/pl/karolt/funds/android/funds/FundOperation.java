@@ -95,7 +95,6 @@ public class FundOperation {
 			
 		return "Operation ("+type+":"+getTypeAsString()+"): "+str;
 	}
-
 	
 	
 	public long getId() {

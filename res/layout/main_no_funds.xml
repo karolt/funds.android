@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" android:orientation="vertical">
+    <TextView 
+    		android:id="@+id/main_txt_no_funds" 
+    		android:text="@string/main_no_funds" 
+    		android:layout_height="wrap_content" 
+    		android:layout_width="wrap_content" 
+    		android:layout_gravity="center_horizontal" 
+    		android:layout_marginTop="45sp">
+    </TextView>
+	<Button 
+			android:id="@+id/main_button_add_fund" 
+			android:layout_height="wrap_content" 
+			android:layout_width="wrap_content" 
+			android:text="@string/main_button_add_fund" 
+			android:layout_gravity="center" 
+			android:layout_marginTop="15sp">
+	</Button>
+</LinearLayout>

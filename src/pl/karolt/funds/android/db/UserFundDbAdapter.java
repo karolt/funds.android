@@ -66,18 +66,42 @@ public class UserFundDbAdapter {
         return mDb.insert(DB_TABLE_NAME, null, initialValues);
     }
     
+    /**
+     * pobiera dane o danym funduszu w porfelu usera
+     * @param Fund fund
+     * @return UserFund
+     */
     public UserFund getByFund(Fund fund)
     {
     	Cursor c = mDb.query(DB_TABLE_NAME, new String[] {"_id","fundId", "moneyPaid", "currentValue", "units", "simpleReturn"}, "fundId = " + fund.getId(), null, null, null, null);
-
-    	if (c != null) {
-            c.moveToFirst();
-        }
     	
+    	if (c.getCount() == 0) {
+    		return null;
+    	}
+    	
+    	c.moveToFirst();
+        
     	return new UserFund(c, fund);
     	
     }
     
+    public int update(UserFund userFund)
+    {
+    	ContentValues newValues = new ContentValues();
+    	//TODO: updateing only changed fields
+    	newValues.put("fundId", userFund.getFundId());
+    	newValues.put("moneyPaid", userFund.getMoneyPaid());
+    	newValues.put("currentValue", userFund.getCurrentValue());
+    	newValues.put("units", userFund.getUnits());
+    	newValues.put("simpleReturn", userFund.getSimpleReturn());
+        
+    	return mDb.update(DB_TABLE_NAME, newValues, "_id = " + userFund.getId(), null);
+    }
+    
+    /**
+     * pobiera wszystkie fundusze w portfelu usera
+     * @return
+     */
     public Cursor getAll()
     {
     	return mDb.query(DB_TABLE_NAME, new String[] {"_id","fundId", "moneyPaid", "currentValue", "units", "simpleReturn"}, null, null, null, null, null);
