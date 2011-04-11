@@ -5,8 +5,10 @@ package pl.karolt.funds.android;
 import pl.karolt.funds.android.db.FundDbAdapter;
 import pl.karolt.funds.android.db.DbHelper;
 import pl.karolt.funds.android.db.FundOperationHistoryDbAdapter;
+import pl.karolt.funds.android.db.UserFundDbAdapter;
 import pl.karolt.funds.android.funds.Fund;
 import pl.karolt.funds.android.funds.FundOperation;
+import pl.karolt.funds.android.funds.UserFund;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -32,6 +34,7 @@ public class FundsMain extends Activity {
 	
 	private FundDbAdapter mAllFundsDb;
 	private FundOperationHistoryDbAdapter mFundOperationHistoryDb;
+	private UserFundDbAdapter mUserFundDb;
 	
     /** Called when the activity is first created. */
     @Override
@@ -54,12 +57,16 @@ public class FundsMain extends Activity {
         mFundOperationHistoryDb = new FundOperationHistoryDbAdapter(this);
         mFundOperationHistoryDb.open();
         
+        mUserFundDb = new UserFundDbAdapter(this);
+        mUserFundDb.open();
+        
         //DbHelper helper = DbHelper.getInstance(this);
-        //helper.onUpgrade(helper.getWritableDatabase(),2,3);
+        //helper.onUpgrade(helper.getWritableDatabase(),2,2);
         
         _writeAllFundsToLog();
         _populateFields();
         _writeAllPurchasesToLog();
+        _writeAllUserFundsToLog();
     }
 
 	@Override
@@ -95,6 +102,7 @@ public class FundsMain extends Activity {
         _writeAllFundsToLog();
         _populateFields();
         _writeAllPurchasesToLog();
+        _writeAllUserFundsToLog();
         
     }
 	
@@ -153,17 +161,41 @@ public class FundsMain extends Activity {
         FundOperation operation; 
         while (!allPurchases.isAfterLast())
         {
-        	operation = new FundOperation(
-        					allPurchases.getLong(allPurchases.getColumnIndex("fundId")),
-        					allPurchases.getDouble(allPurchases.getColumnIndex("value")),
-        					allPurchases.getDouble(allPurchases.getColumnIndex("units")),
-        					allPurchases.getInt(allPurchases.getColumnIndex("type")),
-        					allPurchases.getString(allPurchases.getColumnIndex("performedAt")));
-        					
+        	operation = new FundOperation(allPurchases);
 
         	Log.d(TAG, "Found " + operation);
         	allPurchases.moveToNext();
         }
+	}
+	
+	/**
+	 * wypisuje do logCata informacje o wszystkich dostepnych funduszach usera
+	 * 
+	 * 
+	 */
+	public void _writeAllUserFundsToLog()
+	{
+		Log.d(TAG, "ALL USER FUNDS:");
+		
+		Cursor allUserFunds = mUserFundDb.getAll();
+        startManagingCursor(allUserFunds);
+        
+		allUserFunds.moveToFirst();
+        UserFund userFund;
+        long fundId;
+        try 
+        {
+        	while (!allUserFunds.isAfterLast())
+            {
+        		fundId = allUserFunds.getLong(allUserFunds.getColumnIndex("fundId"));
+            	userFund = new UserFund(allUserFunds, mAllFundsDb.getById(fundId));
+            	Log.d(TAG, "found " + userFund);
+            	allUserFunds.moveToNext();
+            }
+        } catch (Exception e) {
+        	Log.e(TAG, e.getMessage());
+        }
+        
 	}
 	
 	

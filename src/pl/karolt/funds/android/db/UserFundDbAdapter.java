@@ -1,6 +1,7 @@
 package pl.karolt.funds.android.db;
 
 
+import pl.karolt.funds.android.funds.Fund;
 import pl.karolt.funds.android.funds.UserFund;
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,7 +20,7 @@ public class UserFundDbAdapter {
         						+ "fundId integer not_null, "
 								+ "moneyPaid double not null, "
 								+ "units double not null, "
-								+ "currentValue double not null"
+								+ "currentValue double not null, "
 								+ "simpleReturn double"
 								+ ");";
 	
@@ -63,6 +64,18 @@ public class UserFundDbAdapter {
         
         Log.v(TAG, "adding new User Fund " + userFund);
         return mDb.insert(DB_TABLE_NAME, null, initialValues);
+    }
+    
+    public UserFund getByFund(Fund fund)
+    {
+    	Cursor c = mDb.query(DB_TABLE_NAME, new String[] {"_id","fundId", "moneyPaid", "currentValue", "units", "simpleReturn"}, "fundId = " + fund.getId(), null, null, null, null);
+
+    	if (c != null) {
+            c.moveToFirst();
+        }
+    	
+    	return new UserFund(c, fund);
+    	
     }
     
     public Cursor getAll()

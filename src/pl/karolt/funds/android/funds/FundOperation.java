@@ -1,5 +1,7 @@
 package pl.karolt.funds.android.funds;
 
+import android.database.Cursor;
+
 public class FundOperation {
 	
 	/**
@@ -70,6 +72,16 @@ public class FundOperation {
 		this.units = units;
 		this.performedAt = performedAt;
 		this.type = type;
+	}
+	
+	public FundOperation(Cursor c)
+	{
+		id		= c.getLong(c.getColumnIndex("_id"));
+		fundId	= c.getLong(c.getColumnIndex("fundId"));
+		value	= c.getDouble(c.getColumnIndex("value"));
+		units	= c.getDouble(c.getColumnIndex("units"));
+		type	= c.getInt(c.getColumnIndex("type"));
+		performedAt = c.getString(c.getColumnIndex("performedAt"));
 	}
 	
 	public String toString()

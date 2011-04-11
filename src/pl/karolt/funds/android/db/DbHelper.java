@@ -93,7 +93,7 @@ public class DbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		//TODO: implement me
-		Log.w(TAG, "onUpgrade DOING NOTHING, wanted to Upgrade from version:" + oldVersion + " to version:" + newVersion);
+		//Log.w(TAG, "onUpgrade DOING NOTHING, wanted to Upgrade from version:" + oldVersion + " to version:" + newVersion);
 		
 		drop(db);
 
@@ -110,7 +110,7 @@ public class DbHelper extends SQLiteOpenHelper {
 			tableName	= tableNames.next();
 			
 			Log.d(TAG, "dropping table " + tableName);
-			query = "DROP TABLE " + tableName;
+			query = "DROP TABLE IF EXISTS " + tableName + "" ;
 			db.execSQL(query);
 		}
 	}

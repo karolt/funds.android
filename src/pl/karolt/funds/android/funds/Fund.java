@@ -116,6 +116,12 @@ public class Fund {
 	public void setCurrentValue(double currentValue) {
 		this.currentValue = currentValue;
 	}
+	
+	public double getValueForDate(String date)
+	{
+		//TODO
+		return getCurrentValue();
+	}
 
 
 	public long getId() {

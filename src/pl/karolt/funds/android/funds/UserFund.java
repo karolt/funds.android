@@ -1,5 +1,7 @@
 package pl.karolt.funds.android.funds;
 
+import android.database.Cursor;
+
 public class UserFund {
 	
 	/**
@@ -51,10 +53,29 @@ public class UserFund {
 		this.currentValue = currentValue;
 		this.simpleReturn = simpleReturn;
 	}
-
-
-
-
+	
+	public UserFund(Fund fund, double moneyPaid, double units,
+			double currentValue, double simpleReturn) {
+		super();
+		this.fund = fund;
+		this.fundId = fund.getId();
+		this.moneyPaid = moneyPaid;
+		this.units = units;
+		this.currentValue = currentValue;
+		this.simpleReturn = simpleReturn;
+	}
+	
+	public UserFund(Cursor cursor, Fund f)
+	{
+		id		= cursor.getLong(cursor.getColumnIndex("_id"));
+		fundId	= cursor.getLong(cursor.getColumnIndex("fundId"));
+		fund	= f;
+		moneyPaid		= cursor.getDouble(cursor.getColumnIndex("moneyPaid"));
+		units			= cursor.getDouble(cursor.getColumnIndex("units"));
+		simpleReturn	= cursor.getDouble(cursor.getColumnIndex("simpleReturn"));
+		currentValue	= cursor.getDouble(cursor.getColumnIndex("currentValue"));
+	}
+	
 	public String toString()
 	{
 		String str = "fundId="+fundId+", moneyPaid="+moneyPaid+", units="+units+", currentValue="+currentValue+" simpleReturn="+simpleReturn; 

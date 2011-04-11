@@ -2,8 +2,10 @@ package pl.karolt.funds.android;
 
 import pl.karolt.funds.android.db.FundDbAdapter;
 import pl.karolt.funds.android.db.FundOperationHistoryDbAdapter;
+import pl.karolt.funds.android.db.UserFundDbAdapter;
 import pl.karolt.funds.android.funds.Fund;
 import pl.karolt.funds.android.funds.FundOperation;
+import pl.karolt.funds.android.funds.UserFund;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -22,6 +24,7 @@ public class FundsAdd extends Activity {
 	
 	private FundDbAdapter mAllFundsDb;
 	private FundOperationHistoryDbAdapter mFundOperationHistoryDb;
+	private UserFundDbAdapter mUserFundDb;
 	
 	private Spinner mAllFundsSpinner;
 	
@@ -40,6 +43,32 @@ public class FundsAdd extends Activity {
         
         mFundOperationHistoryDb = new FundOperationHistoryDbAdapter(this);
         mFundOperationHistoryDb.open();
+        
+        mUserFundDb = new UserFundDbAdapter(this);
+        mUserFundDb.open();
+        
+        /*
+    	Fund f1 = new Fund("UniKorona Obligacje", 259.59, Fund.TYPE_BONDS);
+    	mAllFundsDb.addNewFund(f1);
+    	
+    	f1 = new Fund("Amplico SFIO Subfundusz Obligacji Œwiatowych", 8.45, Fund.TYPE_BONDS);
+    	mAllFundsDb.addNewFund(f1);
+    	        	
+    	f1 = new Fund("Idea Stabilnego Wzrostu", 214.69, Fund.TYPE_HYBRID);
+    	mAllFundsDb.addNewFund(f1);
+    	
+    	f1 = new Fund("BPH Subfundusz Stabilnego Wzrostu", 16.30, Fund.TYPE_HYBRID);
+    	mAllFundsDb.addNewFund(f1);
+    	
+    	f1 = new Fund("UniStabilny Wzrost", 146.48, Fund.TYPE_HYBRID);
+    	mAllFundsDb.addNewFund(f1);
+    	
+    	f1 = new Fund("Idea Akcji", 231.67, Fund.TYPE_STOCK);
+    	mAllFundsDb.addNewFund(f1);
+    	
+    	f1 = new Fund("BPH Subf Globalny ¯ywnoœci i Surowców", 170.37, Fund.TYPE_HYBRID);
+    	mAllFundsDb.addNewFund(f1);
+    */
         
         
         Button addButton = (Button)findViewById(R.id.add_button_add);
@@ -95,6 +124,14 @@ public class FundsAdd extends Activity {
         
     }
     
+    @Override
+    protected void onDestroy() {
+    	super.onDestroy();
+    	mAllFundsDb.close();
+    	mUserFundDb.close();
+    	mFundOperationHistoryDb.close();
+    }
+    
     
     private void _populateFields()
 	{
@@ -134,9 +171,14 @@ public class FundsAdd extends Activity {
 		Fund fund = mAllFundsDb.getById(mSelectedFundId);
 		double value = Double.parseDouble(valueStr);
 		
-		double units = value / fund.getCurrentValue();
+		double units = value / fund.getValueForDate(date);
 		FundOperation operation = new FundOperation(fund, value, units, FundOperation.TYPE_BUY, date);
 		mFundOperationHistoryDb.newOperation(operation);
+		
+		UserFund userFund = new UserFund(fund, value, units, value, 0.0);
+		mUserFundDb.newUserFund(userFund);
+		
+		
 		return true;
 	}
 	
